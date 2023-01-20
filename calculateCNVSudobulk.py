@@ -59,11 +59,11 @@ def calculatePopulationSomies(atac_dict,wgs_dict):
     base_atac = []
     common_keys = set(wgs_dict).intersection(atac_dict) #filtering for the common CNV locations between the two datasets
     sort_common_keys=sorted(common_keys)
-    print(sort_common_keys)
+    #print(sort_common_keys)
     counts=0
     for k in sort_common_keys:
-        #if k[0]!=0: #selecting for all chromosomes
-        if k[0]!=0:  # selecting for all chromosomes
+        if k[0]==22: #selecting for all chromosomes
+        #if k[0]!=0:  # selecting for all chromosomes
             counts=counts+1
             #Calculating pseudobulk representation for the scWGS. 1 is loss, 2 is disomic and 3 is gain
             loss_wgs.append((wgs_dict[k].count(1)+wgs_dict[k].count(0))/len(wgs_dict[k]))
@@ -110,8 +110,8 @@ def createLinePlot(loss_wgs, base_wgs, gain_wgs, loss_atac, base_atac, gain_atac
     #borders_10000_85=[0,2230,4592,6541,8406,10161,11844,13386,14802,15921,17221,18525,19826,20779,21654,22441,23207,23980,24719,25274,25875,26212,26551]
     plt.plot(x, wgs_plot, color='#98d1d1', label="GS")
     plt.plot(x, atac_plot, color='#df979e', label="ATAC")
-    for border in borders_hct:
-        plt.axvline(border, color='gray')
+    #for border in borders_hct:
+    #    plt.axvline(border, color='gray')
     plt.title("HCT116 scATAC br15 minsizeCNV=0 compared to scDNA")
     plt.xlim((0, len(atac_plot)))
     plt.legend()

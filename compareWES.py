@@ -4,9 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import fargv
 import scipy
-import scipy.stats
 import scipy.ndimage
-import math
 
 #Helping script for the comparison of WES data with the output of epineufinder.
 #Calculated the pseudobulk dataset from the epiAneufinder results and compares them to the normalized WES dataset.
@@ -62,21 +60,18 @@ def preprocessWES(exon_coverage, wes_reads, gaussian_sigma=0, chr_filter="All", 
     for tsv_line in wes_reads:
         line = tsv_line.strip().split("\t")
         if line[1] == chr_filter or chr_filter == "All":
-            if int(line[7])!=0:
-                fraction.append(int(line[6]) / int(line[7])) #Normalization of the WES tumor signal by the control.
+            if int(line[7]) != 0:
+                fraction.append(int(line[6]) / int(line[7]))  # Normalization of the WES tumor signal by the control.
             else:
                 fraction.append(1)
     for tsv_line in exon_coverage:
         line = tsv_line.strip().split("\t")
         if line[0] == chr_filter or chr_filter == "All":
-            if float(line[-1])!=0:
-                coverage.append(float(line[-1])) #Normalization of the WES tumor signal by the exon bases.
-            else:
-                coverage.append(1)
+            coverage.append(float(line[-1])) #Normalization of the WES tumor signal by the exon bases.
     normalised_wes = np.array([x * y for x, y in zip(fraction, coverage)])
-    #normalised_wes = np.array([math.log((x * y),2) for x, y in zip(fraction, coverage)])
-    #normalised_wes = np.array([math.log(x,2) for x in fraction])
-    #normalised_wes = np.array([x for x in fraction])
+    # normalised_wes = np.array([math.log((x * y),2) for x, y in zip(fraction, coverage)])
+    # normalised_wes = np.array([math.log(x,2) for x in fraction])
+    # normalised_wes = np.array([x for x in fraction])
     smoothed_wes = scipy.ndimage.gaussian_filter1d(normalised_wes, gaussian_sigma, axis=- 1, order=0, output=None, mode=filter_edges) #Gaussian filter on the normalized WES signal
     return(smoothed_wes)
 
@@ -92,10 +87,10 @@ if __name__ =="__main__":
     p,_ = fargv.fargv(p)
     harmonics = {}
     #By uncommenting the next three lines, commenting the for-loop and changing the range different sigmas can be calculated iteratively.
-    for sigma in range(2,40 , 2):
-        p.smooth_sigma = sigma
+    #for sigma in range(28,40 , 2):
+    #    p.smooth_sigma = sigma
         #atac_dict=createDictionaryFromTable(atac_input)
-    #for _ in (0,):
+    for _ in (0,):
         atac_loss, atac_base, atac_gain = countNplicitiesFromTable(pd.read_csv(p.atac_input, sep=" "), chr_filter=p.chr)
         atac_array=preprocessATAC(atac_loss, atac_base, atac_gain)
 
@@ -113,26 +108,21 @@ if __name__ =="__main__":
         #Borders of chomosomes by number of bins for the protting function.
         #su008_chr_borders=[0,2174,4386,6265,7913,9591,11106,12563,13924,14966,16164,17371,18611,19431,20210,20973,21678,22416,23121,23649,24231,24526,24854]
         #su008_1e6_borders=[0,217,449,642,822,995,1158,1310,1448,1558,1684,1809,1935,2027,2113,2189,2264,2339,2411,2464,2520,2552,2583]
-        #su006_pre_chr_borders_br7=[0,2148,4310,6247,8064,9794,11426,12934,14338,15360,16629,17916,19198,20141,21010,21779,22545,23310,24042,24588,25169,25501,25828]
-        su006_pre_chr_borders = [0, 2118, 4261,6141, 7940, 9623, 11105,12589, 13967, 13601, 14867, 16136, 17384, 18094,18940, 19685, 20446, 21182, 21861, 22396, 22971, 23299,23612]
+        su006_pre_chr_borders=[0,2148,4310,6247,8064,9794,11426,12934,14338,15360,16629,17916,19198,20141,21010,21779,22545,23310,24042,24588,25169,25501,25828]
         #su006_pre_1e6_borders=[0,217,449,642,822,995,1158,1310,1448,1557,1638,1808,1934,2026,2112,2188,2263,2338,2410,2463,2519,2551,2582]
         #su006_post=[0,2152,4453,6328,8058,9734,11344,12818,14140,15206,16439,17681,18947,19867,20698,21468,22210,22951,23658,24200,24769,25065,25392]
         #greenleaf_all=[0,2284,4672,6609,8492,10290,11985,13563,15001,16193,17509,18841,20161,21131,22027,22861,23669,24485,25268,25847,26459,26828,27197]
-        #su008_pre_br7=[0,2164,4420,6339,8076,9723,11335,12814,14209,15282,16526,17773,19040,19888,20705,21469,22188,22930,23654,24194,24777,25091,25410]
-        su008_pre = [0, 2135, 4372, 6235, 7956, 9558, 11025, 12484, 13855, 14918, 16160, 17392, 18627, 19267, 20062, 20802, 21518, 22234, 22905, 22753, 22811, 23125, 23431]
-        for border in su006_pre_chr_borders:
+        su008_pre=[0,2164,4420,6339,8076,9723,11335,12814,14209,15282,16526,17773,19040,19888,20705,21469,22188,22930,23654,24194,24777,25091,25410]
+        for border in su008_pre:
            plt.axvline(border, color='gray')
         plt.title(f"{p.title} for Chromosome {p.chr} \nCorrelation coefficient: {np.corrcoef(both.T)[1,0]:.5}")
         print(p.chr,{np.corrcoef(both.T)[1,0]:.5})
-        print(scipy.stats.pearsonr(standarize(bulk_array),standarize(atac_array)))
         plt.legend([f"WES sigma: {p.smooth_sigma}", "scATAC"])
         plt.xlabel("epiAneufinder bins")
         plt.ylabel("Standardized values")
         plt.xlim((0,len(bulk_array)))
 
-        #plt.show()
+        plt.show()
         harmonics[p.smooth_sigma]=np.corrcoef(both.T)[1,0]
         print(harmonics)
-
-
-
+        #python3 compareWES.py -atac_input=../../revisions/SU006pre_br15_msCNV0/epiAneufinder_results/SU006pre_br15_msCNV0_results_table.tsv -wes_reads=../../WES/SU006_pre_msCNV0/SU006pre_br15_msCNV0_CNV.txt -exon_coverage=../../WES/SU006_pre_msCNV0/SU006pre_br15_msCNV0_CNVpositions_exonCovergare.txt -smooth_sigma=12
