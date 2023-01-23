@@ -87,7 +87,7 @@ if __name__ =="__main__":
     p,_ = fargv.fargv(p)
     harmonics = {}
     #By uncommenting the next three lines, commenting the for-loop and changing the range different sigmas can be calculated iteratively.
-    #for sigma in range(28,40 , 2):
+    #for sigma in range(4,40 , 2):
     #    p.smooth_sigma = sigma
         #atac_dict=createDictionaryFromTable(atac_input)
     for _ in (0,):
@@ -106,17 +106,18 @@ if __name__ =="__main__":
         plt.plot(both)
         labels=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
         #Borders of chomosomes by number of bins for the protting function.
-        #su008_chr_borders=[0,2174,4386,6265,7913,9591,11106,12563,13924,14966,16164,17371,18611,19431,20210,20973,21678,22416,23121,23649,24231,24526,24854]
-        #su008_1e6_borders=[0,217,449,642,822,995,1158,1310,1448,1558,1684,1809,1935,2027,2113,2189,2264,2339,2411,2464,2520,2552,2583]
         su006_pre_chr_borders=[0,2148,4310,6247,8064,9794,11426,12934,14338,15360,16629,17916,19198,20141,21010,21779,22545,23310,24042,24588,25169,25501,25828]
-        #su006_pre_1e6_borders=[0,217,449,642,822,995,1158,1310,1448,1557,1638,1808,1934,2026,2112,2188,2263,2338,2410,2463,2519,2551,2582]
-        #su006_post=[0,2152,4453,6328,8058,9734,11344,12818,14140,15206,16439,17681,18947,19867,20698,21468,22210,22951,23658,24200,24769,25065,25392]
-        #greenleaf_all=[0,2284,4672,6609,8492,10290,11985,13563,15001,16193,17509,18841,20161,21131,22027,22861,23669,24485,25268,25847,26459,26828,27197]
         su008_pre=[0,2164,4420,6339,8076,9723,11335,12814,14209,15282,16526,17773,19040,19888,20705,21469,22188,22930,23654,24194,24777,25091,25410]
-        for border in su008_pre:
+        su006_msCNV0=[0, 2118, 4261, 6141, 7940, 9623, 11105, 12589, 13967, 14979,16245, 17514, 18762, 19472, 20318, 21063, 21824, 22560, 23239, 23774, 24349, 24677,24990]
+        su008_msCNV0=[0, 2135, 4372, 6235, 7956, 9558, 11025, 12484, 13855, 14918, 16160, 17392, 18627, 19267, 20062, 20802, 21518, 22234, 22905, 23434, 24011, 24325, 24631]
+        for border in su008_msCNV0:
            plt.axvline(border, color='gray')
         plt.title(f"{p.title} for Chromosome {p.chr} \nCorrelation coefficient: {np.corrcoef(both.T)[1,0]:.5}")
         print(p.chr,{np.corrcoef(both.T)[1,0]:.5})
+        difference_array = np.subtract(atac_array, bulk_array)
+        squared_array = np.square(difference_array)
+        mse = squared_array.mean()
+        print("Mean Square Error: ", squared_array.mean())
         plt.legend([f"WES sigma: {p.smooth_sigma}", "scATAC"])
         plt.xlabel("epiAneufinder bins")
         plt.ylabel("Standardized values")
