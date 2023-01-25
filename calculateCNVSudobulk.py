@@ -105,21 +105,22 @@ def createLinePlot(loss_wgs, base_wgs, gain_wgs, loss_atac, base_atac, gain_atac
     print("Mean Absolute Error: ",mean_absolute_error(atac_array,wgs_array))
     x = list(range(len(wgs_plot)))
     borders_hct=[0,2232,4601,6553,8420,10174,11815,13381,14796,15979,17283,18597,19894,20841,21688,22475,23251,24036,24811,25349,25960,26307,26654]
+    borders_snu=[0, 2231, 4593, 6542, 8406, 10161, 11844, 13386, 14802, 15922, 17224, 18529, 19830, 20783, 21658, 22445, 23211, 23985, 24725, 25280, 25881, 26218, 26557]
     #borders_1e6=[0,218,450,643,823,996,1159,1311,1449,1558,1684,1809,1935,2027,2113,2189,2264,2339,2410,2463,2520,2552,2583]
-    #borders_101=[0,2284,4672,6645,8528,10362,12021,13599,15037,16229,17545,18877,20197,21167,22063,22897,23705,24521,25304,25883,26495,26864,27233]
+    #borders_101=[0,2284,4672,6645,8528,10362,0.86837989469864670.868379894698646712021,13599,15037,16229,17545,18877,20197,21167,22063,22897,23705,24521,25304,25883,26495,26864,27233]
     #borders_10000_85=[0,2230,4592,6541,8406,10161,11844,13386,14802,15921,17221,18525,19826,20779,21654,22441,23207,23980,24719,25274,25875,26212,26551]
     plt.plot(x, wgs_plot, color='#98d1d1', label="GS")
     plt.plot(x, atac_plot, color='#df979e', label="ATAC")
-    #for border in borders_hct:
-    #    plt.axvline(border, color='gray')
-    plt.title("HCT116 scATAC br15 minsizeCNV=0 compared to scDNA")
+    for border in borders_snu:
+        plt.axvline(border, color='gray')
+    plt.title("SNU601 scATAC br15 minsizeCNV=0 compared to scDNA")
     plt.xlim((0, len(atac_plot)))
     plt.legend()
     plt.show()
 
 if __name__ =="__main__":
-    fin=open("/home/katia/Helmholz/epiAneufinder/HCT116/WGS/HCT116_WT_T0_2N/BROWSERFILES/method-edivisive/binsize_1e+05_stepsize_1e+05_CNV.converted.bed")
-    snu_full=pd.read_csv("/home/katia/Helmholz/epiAneufinder/revisions/HCT_br15_msCNV0/epiAneufinder_results/results_table.tsv", sep=" ")
+    fin=open("/home/katia/Helmholz/epiAneufinder/SNU_WGS/window_1e5/binsize_1e+05_stepsize_1e+05_CNV.removeCluster2.bed_CNV.converted.bed")
+    snu_full=pd.read_csv("/home/katia/Helmholz/epiAneufinder/revisions/SNU601_br15_minsizeCNV0/epiAneufinder_results/results_table_noChr.tsv", sep=" ")
     #sample1=pd.read_csv("/home/katia/Helmholz/epiAneufinder/revisions/GSM4861381_COLO320HSR_rep8_atac/epiAneufinder_results/colo320HSP_rep8_results_table.tsv", sep=" ")
     #sample1_dict=createDictionaryFromTable(sample1)
     #sample2 = pd.read_csv("/home/katia/Helmholz/epiAneufinder/revisions/GSM4861379_COLO320HSR_rep7_atac/epiAneufinder_results/colo320HSP_rep7_results_table.tsv", sep=" ")
