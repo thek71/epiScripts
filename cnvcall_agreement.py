@@ -40,7 +40,7 @@ def get_distance_values(ref, sample, offset=4):
     #union_match[index_of(union_cell_ids,ref_cell_ids),:][:,index_of(union_location_ids,ref_location_ids)] = ref_values
     ref_cell_ids=index_of(union_cell_ids, ref_cell_ids)
     ref_location_ids=index_of(union_location_ids, ref_location_ids)
-    #union_match[ref_cell_ids,:][:,ref_locloss_atac,base_atac,gain_atacation_ids] = ref_values
+    #union_match[ref_cell_ids,:][:,ref_location_ids] = ref_values
     union_match[np.ix_(ref_location_ids, ref_cell_ids)] = ref_values
 
 

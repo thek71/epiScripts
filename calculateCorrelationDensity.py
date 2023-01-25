@@ -20,7 +20,7 @@ def calculatePopulationSomies(atac_dict, density_dict):
     base_atac = []
     common_keys = set(density_dict).intersection(atac_dict) #filtering for the common CNV locations between the two datasets
     sort_common_keys=sorted(common_keys)
-    filtered_density_dict = {k: v for k, vurves in density_dict.items() if k in sort_courvesmmon_keys}
+    filtered_density_dict = {k: v for k, v in density_dict.items() if k in sort_common_keys}
     #print(sort_common_keys)
     counts=0
     for k in sort_common_keys:
