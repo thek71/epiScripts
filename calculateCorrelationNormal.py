@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 import copy
 import scipy.stats
-from collections import defaultdict
 from matplotlib import pyplot as plt
 from sklearn.metrics import r2_score, mean_absolute_error
 #plt.style.use('seaborn-whitegrid')
@@ -13,7 +12,7 @@ from sklearn.metrics import r2_score, mean_absolute_error
 
 #Script for calculating the correlation between a normal sample and an ideal diploid sample.
 #Input is the table with the results from epiAneufinder.
-
+#replace = list(map(lambda x: x.replace('Pant', 'Ishan'), l))
 def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
 
@@ -26,14 +25,14 @@ def createDictionaryFromTable(table):
 #Function for creating the ideal normal sample, by copying the dictionary created from the epiAneufinder data
 def createNormalBase(dictionary):
     base_dict=copy.deepcopy(dictionary)
-    for i, j in base_dict.items():  # use iteritems in py2k
-        if j == 2:
-            base_dict[i] =-2
+    for i in base_dict.values():
+        for j in range(len(i)):
+            if i[j] != "2":
+                i[j]="2"
+    #print(base_dict)
     return(base_dict)
 
 def calculatePopulationSomies(atac_dict,base_dict):
-    gain_wgs=[]
-    loss_wgs = []
     base_wgs = []
     gain_atac = []
     loss_atac = []
@@ -47,61 +46,52 @@ def calculatePopulationSomies(atac_dict,base_dict):
         #if k[0]!=0:  # selecting for all chromosomes
             counts=counts+1
             #Calculating pseudobulk representation for the scWGS. 1 is loss, 2 is disomic and 3 is gain
-            loss_wgs.append((base_dict[k].count(1)+base_dict[k].count(0))/len(base_dict[k]))
-            base_wgs.append(base_dict[k].count(2) / len(base_dict[k]))
-            gain_wgs.append(base_dict[k].count(3) / len(base_dict[k]))
+            base_wgs.append(base_dict[k].count("2") / len(base_dict[k]))
             #Calculating pseudobulk representation for the scATAC. 0 is loss, 1 is disomic and 2 is gain
             #If the user changes notation it should be changed here as well
             loss_atac.append(atac_dict[k].count(0) / len(atac_dict[k]))
             base_atac.append(atac_dict[k].count(1) / len(atac_dict[k]))
             gain_atac.append(atac_dict[k].count(2) / len(atac_dict[k]))
     print("Count Bins:",counts)
-    return(loss_wgs,base_wgs, gain_wgs, loss_atac, base_atac, gain_atac)
+    return(base_wgs, loss_atac, base_atac, gain_atac)
 
-def createLinePlot(loss_wgs, base_wgs, gain_wgs, loss_atac, base_atac, gain_atac):
+def createLinePlot(base_wgs, loss_atac, base_atac, gain_atac):
     new_base_wgs = [x * 2 for x in base_wgs]
+    #print(new_base_wgs)
     new_base_atac = [x * 2 for x in base_atac]
-    new_gain_wgs = [x * 3 for x in gain_wgs]
     new_gain_atac = [x * 3 for x in gain_atac]
-    wgs_plot=[sum(x) for x in zip(new_gain_wgs,new_base_wgs,loss_wgs)]
+    wgs_plot=[sum(x) for x in zip(new_base_wgs)]
     atac_plot = [sum(x) for x in zip(new_gain_atac, new_base_atac, loss_atac)]
     atac_array=np.array(atac_plot)
     wgs_array=np.array(wgs_plot)
-    #outf=open("genome.csv","w")
-    #both = np.concatenate([atac_array[:, None], wgs_array[:, None]], axis=1)
-    #np.savetxt(outf, both, delimiter=",")
-    #outf.close()
-    #print(np.corrcoef(atac_array,wgs_array))
-    print("Pearson Correlation : ",scipy.stats.pearsonr(atac_array, wgs_array))
-    print("Spearman Correlation : ", scipy.stats.spearmanr(atac_array, wgs_array)[0])
-    print("Kendall Correlation : ", scipy.stats.kendalltau(atac_array, wgs_array)[0])
 
     difference_array = np.subtract(atac_array, wgs_array)
     squared_array = np.square(difference_array)
     mse = squared_array.mean()
+    print("Variation: ", scipy.stats.variation(atac_array))
     print("Mean Square Error: ",squared_array.mean())
 
-    print("R square: ",r2_score(atac_array, wgs_array))
-    print("Mean Absolute Error: ",mean_absolute_error(atac_array,wgs_array))
     x = list(range(len(wgs_plot)))
-    borders_hct=[0,2232,4601,6553,8420,10174,11815,13381,14796,15979,17283,18597,19894,20841,21688,22475,23251,24036,24811,25349,25960,26307,26654]
-    borders_snu=[0, 2231, 4593, 6542, 8406, 10161, 11844, 13386, 14802, 15922, 17224, 18529, 19830, 20783, 21658, 22445, 23211, 23985, 24725, 25280, 25881, 26218, 26557]
-    #borders_1e6=[0,218,450,643,823,996,1159,1311,1449,1558,1684,1809,1935,2027,2113,2189,2264,2339,2410,2463,2520,2552,2583]
-    #borders_101=[0,2284,4672,6645,8528,10362,0.86837989469864670.868379894698646712021,13599,15037,16229,17545,18877,20197,21167,22063,22897,23705,24521,25304,25883,26495,26864,27233]
-    #borders_10000_85=[0,2230,4592,6541,8406,10161,11844,13386,14802,15921,17221,18525,19826,20779,21654,22441,23207,23980,24719,25274,25875,26212,26551]
-    plt.plot(x, wgs_plot, color='#98d1d1', label="Base")
-    plt.plot(x, atac_plot, color='#df979e', label="ATAC")
-    for border in borders_snu:
+    borders_bone_marrow=[0,1801, 3655, 5078, 6288, 7528, 8746, 9937, 10999, 11851, 12863, 13813, 14842, 15327, 15909, 16485, 17014, 17634, 18146, 18627, 19088, 19336, 19609]
+    borders_PBMC1=[0, 1325, 2530, 3521, 4239, 5056, 5895, 6652, 7333, 7938, 8647, 9324, 10031, 10331, 10776, 11217,11643, 12194, 12482, 12926, 13293, 13469, 13692]
+    brain_rep1=[0, 2107, 4361, 6223, 7981, 9631, 11225, 12674, 14024, 15086, 16296, 17465, 18690, 19590, 20419, 21163, 21875, 22610, 23329, 23831, 24400, 240707, 25024]
+    brain_rep2=[0, 2076, 4311, 6157, 7875, 9487, 11064, 12484, 13820, 14857, 16049, 17205, 18416, 19298, 20109, 20851, 21554, 22278, 22980, 23481, 24046, 24345, 24658]
+    brain_rep3=[0, 2076, 4315, 6168, 7894, 9523, 11094, 12527, 13868, 14903, 16100, 17268, 18488, 19379, 20198, 20938, 21642, 22368, 23076, 23576, 24145, 24451, 24763]
+    brain_rep4=[0, 2078, 4305, 6151, 7871, 9485, 11051, 12464, 13804, 14846, 16036, 17193, 18410, 19297, 20115, 20856, 21562, 22292, 23001, 23502, 24069, 24379, 24690]
+    plt.plot(x, wgs_plot, color='blue', label="Base", linewidth='2')
+    plt.plot(x, atac_plot, color='orange', label="ATAC")
+    for border in borders_bone_marrow:
         plt.axvline(border, color='gray')
-    plt.title("SNU601 scATAC br15 minsizeCNV=0 compared to scDNA")
+    plt.title("Bone marrow normal dataset")
     plt.xlim((0, len(atac_plot)))
+    plt.ylim(1,3)
     plt.legend()
     plt.show()
 
 if __name__ =="__main__":
-    snu_full=pd.read_csv("/home/katia/Helmholz/epiAneufinder/revisions/Satpathy_BoneMarrow_msCNV0/epiAneufinder_results/results_table.tsv", sep=" ")
+    snu_full=pd.read_csv("/home/katia/Helmholz/epiAneufinder/revisions/Satpathy_BoneMarrow_msCNV0/epiAneufinder_results/results_table_noChr.tsv", sep=" ")
     snu_dict = createDictionaryFromTable(snu_full)
     base_dict = createNormalBase(snu_dict)
-    print(base_dict)
-    loss_wgs, base_wgs, gain_wgs, loss_atac, base_atac, gain_atac = calculatePopulationSomies(snu_dict,base_dict)
-    createLinePlot(loss_wgs, base_wgs, gain_wgs, loss_atac, base_atac, gain_atac)
+    #print(base_dict)
+    base_wgs, loss_atac, base_atac, gain_atac = calculatePopulationSomies(snu_dict,base_dict)
+    createLinePlot(base_wgs, loss_atac, base_atac, gain_atac)
