@@ -115,7 +115,7 @@ def calculatePopulationSomies(atac_dict,wgs_dict):
     return(loss_wgs,base_wgs, gain_wgs, loss_atac, base_atac, gain_atac)
 
 def calculatePopulationSomiesWGS(atac_dict,wgs_dict):
-    #new_atac_dict = {k: [sum(atac_dict[k])/len(atac_dict[k])] for k in atac_dict.keys() if k[0]==9}
+    #new_atac_dict = {k: [sum(atac_dict[k])/len(atac_dict[k])] for k in atac_dict.keys() if k[0]==8}
     new_atac_dict = {k: [sum(atac_dict[k]) / len(atac_dict[k])] for k in atac_dict.keys()}
     common_keys = set(wgs_dict).intersection(new_atac_dict) #filtering for the common CNV locations between the two datasets
     sort_common_keys=sorted(common_keys)
@@ -208,7 +208,7 @@ def createLinePlot(loss_wgs, base_wgs, gain_wgs, loss_atac, base_atac, gain_atac
 if __name__ =="__main__":
     p = {"filter_edges": "nearest",
          "atac_input": "/home/katia/Helmholz/epiAneufinder/revisions/GSM4861367_COLO320HSR_rep1_atac/epiAneufinder_results/colo320HSP_rep1_results_table_nochr.tsv",
-         "wgs_reads": "/home/katia/Helmholz/epiAneufinder/Colo320HSP/aneufinder/COLO320HSR_WGS_perBin_noChr.bed",
+         "wgs_reads": "/home/katia/Helmholz/epiAneufinder/Colo320HSP/aneufinder/COLO320HSR_WGS_perBin.bw20.noChr.bed",
          "smooth_sigma": .1,
          "title": "WGS vs scATAC"}
     p, _ = fargv.fargv(p)
@@ -225,9 +225,9 @@ if __name__ =="__main__":
     snu_dict=createDictionaryFromTable(snu_full)
     bed_dict=createDictionaryFromBed(fin)
     common_wgs_dict, common_atac_dict = calculatePopulationSomiesWGS(snu_dict,bed_dict)
-    #for sigma in range(1, 10, 1):
-    #    p.smooth_sigma = sigma
-    for _ in (0,):
+    for sigma in range(1, 10, 1):
+        p.smooth_sigma = sigma
+    #for _ in (0,):
         correlation=createLinePlotAneufinder(common_wgs_dict, common_atac_dict,gaussian_sigma=p.smooth_sigma, filter_edges=p.filter_edges)
         harmonics[p.smooth_sigma] = correlation
         print(harmonics)
