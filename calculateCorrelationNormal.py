@@ -78,18 +78,21 @@ def createLinePlot(base_wgs, loss_atac, base_atac, gain_atac):
     brain_rep2=[0, 2076, 4311, 6157, 7875, 9487, 11064, 12484, 13820, 14857, 16049, 17205, 18416, 19298, 20109, 20851, 21554, 22278, 22980, 23481, 24046, 24345, 24658]
     brain_rep3=[0, 2076, 4315, 6168, 7894, 9523, 11094, 12527, 13868, 14903, 16100, 17268, 18488, 19379, 20198, 20938, 21642, 22368, 23076, 23576, 24145, 24451, 24763]
     brain_rep4=[0, 2078, 4305, 6151, 7871, 9485, 11051, 12464, 13804, 14846, 16036, 17193, 18410, 19297, 20115, 20856, 21562, 22292, 23001, 23502, 24069, 24379, 24690]
+    brain_multi_rep1=[0, 1940, 4008,5670, 7095, 8538, 9943, 11240,12460, 13410, 14520, 15574, 16685, 17443, 18186, 18888, 19567, 20273, 20928, 21420, 21970, 22236, 22544]
+    brain_multi_rep2 = [0, 1974, 4078, 5766, 7268, 8745, 10175, 11490, 12732, 13693, 14817, 15889, 17025, 17813, 18578, 19290, 19978, 20696, 21362, 21861, 22422, 22699, 23013]
+    brain_multi_rep3 = [0, 1935, 3969, 5613, 7053, 8469, 9878, 11160, 12361, 13296, 14401, 15453, 16553, 17314, 18055, 18752, 19431, 20135, 20784, 21278, 21820, 22079, 22389]
     plt.plot(x, wgs_plot, color='blue', label="Base", linewidth='2')
     plt.plot(x, atac_plot, color='orange', label="ATAC")
-    for border in borders_bone_marrow:
+    for border in brain_multi_rep3:
         plt.axvline(border, color='gray')
-    plt.title("Bone marrow normal dataset")
+    plt.title("Brain rep4 normal dataset")
     plt.xlim((0, len(atac_plot)))
     plt.ylim(1,3)
     plt.legend()
     plt.show()
 
 if __name__ =="__main__":
-    snu_full=pd.read_csv("/home/katia/Helmholz/epiAneufinder/revisions/Satpathy_BoneMarrow_msCNV0/epiAneufinder_results/results_table_noChr.tsv", sep=" ")
+    snu_full=pd.read_csv("/home/katia/Helmholz/epiAneufinder/revisions/multiome_brain_Greenleaf/hft_ctx_w21_dc1r3_r1_ms0/epiAneufinder_results/multiome_brain_dc1r3_r1_msCNV0_results_table_noChr.tsv", sep=" ")
     snu_dict = createDictionaryFromTable(snu_full)
     base_dict = createNormalBase(snu_dict)
     #print(base_dict)
