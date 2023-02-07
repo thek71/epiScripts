@@ -134,7 +134,7 @@ def createLinePlotAneufinder(common_wgs_dict, common_atac_dict,gaussian_sigma=0,
     atac_array = np.hstack(atac_list)
     #atac_array=np.asarray(tuple(common_atac_dict.values()))
     #wgs_array = np.asarray(tuple(common_wgs_dict.values()))
-    print("MIS:", normalized_mutual_info_score(atac_array,wgs_array, average_method='min'))
+    print("MIS:", normalized_mutual_info_score(atac_array,wgs_array, average_method='min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'))
     print("Pearson Correlation : ", scipy.stats.pearsonr(standarize(atac_array),standarize(smoothed_wgs_array)))
     print("Spearman Correlation : ", scipy.stats.spearmanr(atac_array, smoothed_wgs_array)[0])
     print("Kendall Correlation : ", scipy.stats.kendalltau(atac_array, smoothed_wgs_array)[0])
