@@ -19,6 +19,7 @@ standarize = lambda x: ((x - x.mean()) / (x.std() + .0000000000000001)) #The sta
 standarize2 = lambda x: ((x / (x.std() + .0000000000000001)))
 normalize = lambda x: ((2*(x-x.min())/(x.max()-x.min()))+1)
 
+
 def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
 
@@ -115,7 +116,7 @@ def calculatePopulationSomies(atac_dict,wgs_dict):
     return(loss_wgs,base_wgs, gain_wgs, loss_atac, base_atac, gain_atac)
 
 def calculatePopulationSomiesWGS(atac_dict,wgs_dict):
-    #new_atac_dict = {k: [sum(atac_dict[k])/len(atac_dict[k])] for k in atac_dict.keys() if k[0]==8}
+    #new_atac_dict = {k: [sum(atac_dict[k])/len(atac_dict[k])] for k in atac_dict.keys() if k[0]==4}
     new_atac_dict = {k: [sum(atac_dict[k]) / len(atac_dict[k])] for k in atac_dict.keys()}
     common_keys = set(wgs_dict).intersection(new_atac_dict) #filtering for the common CNV locations between the two datasets
     sort_common_keys=sorted(common_keys)
@@ -134,7 +135,7 @@ def createLinePlotAneufinder(common_wgs_dict, common_atac_dict,gaussian_sigma=0,
     atac_array = np.hstack(atac_list)
     #atac_array=np.asarray(tuple(common_atac_dict.values()))
     #wgs_array = np.asarray(tuple(common_wgs_dict.values()))
-    print("MIS:", normalized_mutual_info_score(atac_array,wgs_array, average_method='min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'))
+    print("MIS:", normalized_mutual_info_score(atac_array,wgs_array, average_method='min'))
     print("Pearson Correlation : ", scipy.stats.pearsonr(standarize(atac_array),standarize(smoothed_wgs_array)))
     print("Spearman Correlation : ", scipy.stats.spearmanr(atac_array, smoothed_wgs_array)[0])
     print("Kendall Correlation : ", scipy.stats.kendalltau(atac_array, smoothed_wgs_array)[0])
@@ -148,7 +149,7 @@ def createLinePlotAneufinder(common_wgs_dict, common_atac_dict,gaussian_sigma=0,
     print("Mean Absolute Error: ",mean_absolute_error(atac_array,smoothed_wgs_array))
     x = list(range(len(smoothed_wgs_array)))
     plt.plot(x,(standarize(atac_array)), color='#df979e', label="ATAC")
-    plt.plot(x,(standarize(smoothed_wgs_array)), color='#98d1d1', label="WGS")
+    plt.plot(x,(standarize(smoothed_wgs_array)+0.4), color='#98d1d1', label="WGS")
     borders_colorep1 = [0, 2109, 4392, 6241, 8068,9661, 11085, 12484, 13785, 14854, 16070, 17287, 18527, 19236, 20058, 20758, 21504, 22212, 22836, 23312, 23867, 24172, 24482]
     #plt.plot(x,((atac_array)), color='#df979e', label="ATAC")
     #plt.plot(x,((wgs_array)), color='#98d1d1', label="WGS")
@@ -194,8 +195,8 @@ def createLinePlot(loss_wgs, base_wgs, gain_wgs, loss_atac, base_atac, gain_atac
     #plt.plot(x,standarize(atac_array),color='orange', label="ATAC")
     #both = np.concatenate([standarize(wgs_array)[:, None], standarize(atac_array)[:, None]], axis=1)
     #x = list(range(len(w../../Colo320HSP/aneufinder/COLO320HSR_WGS_perBin_noChr.bedgs_array)))
-    plt.plot(x, (standarize(atac_array)), color='#df979e', label="ATAC")
-    plt.plot(x, (standarize(wgs_array)), color='#98d1d1', label="WGS")
+    plt.plot(x, (normalize(atac_array)), color='#df979e', label="ATAC")
+    plt.plot(x, (normalize(wgs_array)), color='#98d1d1', label="WGS")
     #plt.plot(both)
     for border in borders_colorep1:
         plt.axvline(border, color='gray')
@@ -208,7 +209,7 @@ def createLinePlot(loss_wgs, base_wgs, gain_wgs, loss_atac, base_atac, gain_atac
 if __name__ =="__main__":
     p = {"filter_edges": "nearest",
          "atac_input": "/home/katia/Helmholz/epiAneufinder/revisions/GSM4861367_COLO320HSR_rep1_atac/epiAneufinder_results/colo320HSP_rep1_results_table_nochr.tsv",
-         "wgs_reads": "/home/katia/Helmholz/epiAneufinder/Colo320HSP/aneufinder/COLO320HSR_WGS_perBin.bw20.noChr.bed",
+         "wgs_reads": "/home/katia/Helmholz/epiAneufinder/Colo320HSP/aneufinder/COLO320HSR_WGS_perBin_noChr.bed",
          "smooth_sigma": .1,
          "title": "WGS vs scATAC"}
     p, _ = fargv.fargv(p)
@@ -225,9 +226,9 @@ if __name__ =="__main__":
     snu_dict=createDictionaryFromTable(snu_full)
     bed_dict=createDictionaryFromBed(fin)
     common_wgs_dict, common_atac_dict = calculatePopulationSomiesWGS(snu_dict,bed_dict)
-    for sigma in range(1, 10, 1):
-        p.smooth_sigma = sigma
-    #for _ in (0,):
+    #for sigma in range(1, 10, 1):
+    #    p.smooth_sigma = sigma
+    for _ in (0,):
         correlation=createLinePlotAneufinder(common_wgs_dict, common_atac_dict,gaussian_sigma=p.smooth_sigma, filter_edges=p.filter_edges)
         harmonics[p.smooth_sigma] = correlation
         print(harmonics)
