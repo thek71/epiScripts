@@ -1,5 +1,6 @@
+import matplotlib
 from matplotlib import pyplot as plt
-
+matplotlib.rcParams.update({'font.size': 20})
 precisionLoss=[0.533603356258098,0.573622702061093,0.627966310965399,0.666390499619024,0.693152612380094,0.709543249186439,0.737800685029718,0.776304877767516,0.822630255836184]
 recallLoss=[0.367266626752482,0.461345628246242,0.562263120675302,0.62022533963024,0.653607814746031,0.694129228910018,0.733430232631089,0.766110255794294,0.814347240723739]
 f1Loss=[0.435078775789143,0.511394055468533,0.593301238057351,0.642479691830533,0.672799638507388,0.701751606762282,0.735608967376907,0.771173876007612,0.818467792482006]
@@ -14,29 +15,32 @@ f1Normal=[0.929017949139026,0.935337730298015,0.944807718221826,0.95127791716833
 
 breaks=[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
 
-plt.plot(breaks, precisionGain, label="Gain", color="red")
-plt.plot(breaks, precisionLoss, label="Loss", color="purple")
-plt.plot(breaks, precisionNormal, label="Normal", color="green")
+plt.plot(breaks, precisionGain, label="Gain", color="red", linewidth=3)
+plt.plot(breaks, precisionLoss, label="Loss", color="purple", linewidth=3)
+plt.plot(breaks, precisionNormal, label="Normal", color="green", linewidth=3)
 plt.title("Precision")
 plt.xlabel("sampling rate")
 plt.ylabel("precision")
 plt.legend()
+plt.grid()
 plt.show()
 
-plt.plot(breaks, recallGain, label="Gain", color="red")
-plt.plot(breaks, recallLoss, label="Loss", color="purple")
-plt.plot(breaks, recallNormal, label="Normal", color="green")
+plt.plot(breaks, recallGain, label="Gain", color="red", linewidth=3)
+plt.plot(breaks, recallLoss, label="Loss", color="purple",linewidth=3)
+plt.plot(breaks, recallNormal, label="Normal", color="green",linewidth=3)
 plt.title("Recall")
 plt.xlabel("sampling rate")
 plt.ylabel("recall")
 plt.legend()
+plt.grid()
 plt.show()
 
-plt.plot(breaks, f1Gain, label="Gain", color="red")
-plt.plot(breaks, f1Loss, label="Loss", color="purple")
-plt.plot(breaks, f1Normal, label="Normal", color="green")
+plt.plot(breaks, f1Gain, label="Gain", color="red",linewidth=3)
+plt.plot(breaks, f1Loss, label="Loss", color="purple",linewidth=3)
+plt.plot(breaks, f1Normal, label="Normal", color="green",linewidth=3)
 plt.title("F1")
 plt.xlabel("sampling rate")
 plt.ylabel("F1")
 plt.legend()
+plt.grid()
 plt.show()
