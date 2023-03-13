@@ -1,6 +1,7 @@
 import sys
 import seaborn as sns
 import pandas as pd
+import csv
 import numpy as np
 import scipy.stats
 import fargv
@@ -123,6 +124,9 @@ def calculatePopulationSomiesWGS(atac_dict,wgs_dict):
     #print(sort_common_keys)
     common_wgs_dict = {key: wgs_dict[key] for key in sort_common_keys}
     common_atac_dict = {key: new_atac_dict[key] for key in sort_common_keys}
+    #with open('mycsvfile.csv', 'wb') as f:
+    #    w = csv.writer(f)
+    #    w.writerows(common_atac_dict.items())
     return(common_wgs_dict, common_atac_dict)
 
 #Function for calculating different metrics between the two datasets and creating a line plot of the pseudoibulk data
@@ -161,7 +165,7 @@ def createLinePlotAneufinder(common_wgs_dict, common_atac_dict,gaussian_sigma=0,
     plt.show()
 
     plt.show()
-    return(scipy.stats.pearsonr(standarize(atac_array),standarize(smoothed_wgs_array)))
+    return(scipy.stats.pearsonr(standarize(atac_array),standarize(smoothed_wgs_array)), smoothed_wgs_array)
 def createLinePlot(loss_wgs, base_wgs, gain_wgs, loss_atac, base_atac, gain_atac):
     new_base_wgs = [x * 2 for x in base_wgs]
     new_base_atac = [x * 2 for x in base_atac]
@@ -208,8 +212,8 @@ def createLinePlot(loss_wgs, base_wgs, gain_wgs, loss_atac, base_atac, gain_atac
 
 if __name__ =="__main__":
     p = {"filter_edges": "nearest",
-         "atac_input": "/home/katia/Helmholz/epiAneufinder/revisions/GSM4861367_COLO320HSR_rep1_atac/epiAneufinder_results/colo320HSP_rep1_results_table_nochr.tsv",
-         "wgs_reads": "/home/katia/Helmholz/epiAneufinder/Colo320HSP/aneufinder/COLO320HSR_WGS_perBin_noChr.bed",
+         "atac_input": "/home/katia/Helmholz/epiAneufinder/revisions/GSM4861367_COLO320HSR_rep1_atac_v3blacklist/epiAneufinder_results/results_table_noChr.tsv",
+         "wgs_reads": "/home/katia/Helmholz/epiAneufinder/Colo320HSP/aneufinder/COLO320_HSR_WGS.medianNorm.bed",
          "smooth_sigma": .1,
          "title": "WGS vs scATAC"}
     p, _ = fargv.fargv(p)
@@ -226,10 +230,13 @@ if __name__ =="__main__":
     snu_dict=createDictionaryFromTable(snu_full)
     bed_dict=createDictionaryFromBed(fin)
     common_wgs_dict, common_atac_dict = calculatePopulationSomiesWGS(snu_dict,bed_dict)
+    pd.DataFrame.from_dict(data=common_wgs_dict, orient='index').to_csv('COLO320_wgs_file.csv', header=False)
+    pd.DataFrame.from_dict(data=common_atac_dict, orient='index').to_csv('COLO320_scatac_file.csv', header=False)
     #for sigma in range(1, 10, 1):
     #    p.smooth_sigma = sigma
     for _ in (0,):
-        correlation=createLinePlotAneufinder(common_wgs_dict, common_atac_dict,gaussian_sigma=p.smooth_sigma, filter_edges=p.filter_edges)
+        correlation, smoothed_wgs=createLinePlotAneufinder(common_wgs_dict, common_atac_dict,gaussian_sigma=p.smooth_sigma, filter_edges=p.filter_edges)
+        pd.DataFrame.from_dict(data=smoothed_wgs).to_csv('COLO320_wgs_smoothed_file.csv', header=False)
         harmonics[p.smooth_sigma] = correlation
         print(harmonics)
 

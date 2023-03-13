@@ -59,11 +59,12 @@ def calculatePopulationSomies(atac_dict,wgs_dict):
     base_atac = []
     common_keys = set(wgs_dict).intersection(atac_dict) #filtering for the common CNV locations between the two datasets
     sort_common_keys=sorted(common_keys)
+    open('HCT_keys', 'w').write('\n'.join('%s %s %s' % x for x in sort_common_keys))
     #print(sort_common_keys)
     counts=0
     for k in sort_common_keys:
-        if k[0]==22: #selecting for all chromosomes
-        #if k[0]!=0:  # selecting for all chromosomes
+        #if k[0]==22: #selecting for all chromosomes
+        if k[0]!=0:  # selecting for all chromosomes
             counts=counts+1
             #Calculating pseudobulk representation for the scWGS. 1 is loss, 2 is disomic and 3 is gain
             loss_wgs.append((wgs_dict[k].count(1)+wgs_dict[k].count(0))/len(wgs_dict[k]))
@@ -87,14 +88,15 @@ def createLinePlot(loss_wgs, base_wgs, gain_wgs, loss_atac, base_atac, gain_atac
     atac_plot = [sum(x) for x in zip(new_gain_atac, new_base_atac, loss_atac)]
     atac_array=np.array(atac_plot)
     wgs_array=np.array(wgs_plot)
-    #outf=open("genome.csv","w")
-    #both = np.concatenate([atac_array[:, None], wgs_array[:, None]], axis=1)
-    #np.savetxt(outf, both, delimiter=",")
-    #outf.close()
+    outf=open("resultsHCT.csv","w")
+    both = np.concatenate([atac_array[:, None], wgs_array[:, None]], axis=1)
+    np.savetxt(outf, both, delimiter=",")
+    outf.close()
     #print(np.corrcoef(atac_array,wgs_array))
     print("Pearson Correlation : ",scipy.stats.pearsonr(atac_array, wgs_array))
     print("Spearman Correlation : ", scipy.stats.spearmanr(atac_array, wgs_array)[0])
     print("Kendall Correlation : ", scipy.stats.kendalltau(atac_array, wgs_array)[0])
+
 
     difference_array = np.subtract(atac_array, wgs_array)
     squared_array = np.square(difference_array)
@@ -119,8 +121,8 @@ def createLinePlot(loss_wgs, base_wgs, gain_wgs, loss_atac, base_atac, gain_atac
     plt.show()
 
 if __name__ =="__main__":
-    fin=open("/home/katia/Helmholz/epiAneufinder/SNU_WGS/window_1e5/binsize_1e+05_stepsize_1e+05_CNV.removeCluster2.bed_CNV.converted.bed")
-    snu_full=pd.read_csv("/home/katia/Helmholz/epiAneufinder/revisions/SNU601_br15_minsizeCNV0/epiAneufinder_results/results_table_noChr.tsv", sep=" ")
+    fin=open("/home/katia/Helmholz/epiAneufinder/HCT116/WGS/HCT116_WT_T0_2N/BROWSERFILES/method-edivisive/binsize_1e+05_stepsize_1e+05_CNV.converted.bed")
+    snu_full=pd.read_csv("/home/katia/Helmholz/epiAneufinder/revisions/HCT_br15_msCNV0/epiAneufinder_results/results_table.tsv", sep=" ")
     #sample1=pd.read_csv("/home/katia/Helmholz/epiAneufinder/revisions/GSM4861381_COLO320HSR_rep8_atac/epiAneufinder_results/colo320HSP_rep8_results_table.tsv", sep=" ")
     #sample1_dict=createDictionaryFromTable(sample1)
     #sample2 = pd.read_csv("/home/katia/Helmholz/epiAneufinder/revisions/GSM4861379_COLO320HSR_rep7_atac/epiAneufinder_results/colo320HSP_rep7_results_table.tsv", sep=" ")
