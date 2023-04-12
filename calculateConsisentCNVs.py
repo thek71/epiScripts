@@ -14,7 +14,7 @@ def createDictionaryFromTable(table):
     return(snu_dict)
 
 if __name__ =="__main__":
-    atac=pd.read_csv("/home/katia/Helmholz/epiAneufinder/revisions/GSM4861367_COLO320HSR_rep1_atac_v3blacklist/epiAneufinder_results/results_table.tsv", sep=" ")
+    atac=pd.read_csv("/home/katia/Helmholz/epiAneufinder/revisions/GSM4861367_COLO320HSR_rep1_atac_v4blacklist/epiAneufinder_results/results_table.tsv", sep=" ")
     atac_dict=createDictionaryFromTable(atac)
     for k in atac_dict:
         disomic=atac_dict[k].count(1)

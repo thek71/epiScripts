@@ -59,7 +59,8 @@ def createLinePlot(loss_atac1,base_atac1, gain_atac1, loss_atac2, base_atac2, ga
     new_gain_atac2 = [x * 3 for x in gain_atac2]
     atac1_plot=[sum(x) for x in zip(new_gain_atac1,new_base_atac1,loss_atac1)]
     atac2_plot = [sum(x) for x in zip(new_gain_atac2, new_base_atac2, loss_atac2)]
-    atac2_array=np.array(atac2_plot)df = pd.read_csv('data.csv')
+    atac2_array=np.array(atac2_plot)
+    df = pd.read_csv('data.csv')
 
     atac1_array=np.array(atac1_plot)
     #outf=open("genome.csv","w")

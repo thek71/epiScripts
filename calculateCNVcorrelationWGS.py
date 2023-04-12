@@ -99,8 +99,8 @@ def calculatePopulationSomies(atac_dict,wgs_dict):
     #print(sort_common_keys)
     counts=0
     for k in sort_common_keys:
-        if k[0]==9: #selecting chromosome
-        #if k[0]!=0:  # selecting for all chromosomes
+        #if k[0]==9: #selecting chromosome
+        if k[0]!=0:  # selecting for all chromosomes
             counts=counts+1
             #print(wgs_dict[k])
             #Calculating pseudobulk representation for the WGS. 1 is loss, 2 is disomic and 3 is gain
@@ -124,9 +124,9 @@ def calculatePopulationSomiesWGS(atac_dict,wgs_dict):
     #print(sort_common_keys)
     common_wgs_dict = {key: wgs_dict[key] for key in sort_common_keys}
     common_atac_dict = {key: new_atac_dict[key] for key in sort_common_keys}
-    #with open('mycsvfile.csv', 'wb') as f:
+    #with open('pGBM_keys.csv', 'wb') as f:
     #    w = csv.writer(f)
-    #    w.writerows(common_atac_dict.items())
+    #    w.writerows(" ".join(sort_common_keys))
     return(common_wgs_dict, common_atac_dict)
 
 #Function for calculating different metrics between the two datasets and creating a line plot of the pseudoibulk data
@@ -155,17 +155,20 @@ def createLinePlotAneufinder(common_wgs_dict, common_atac_dict,gaussian_sigma=0,
     plt.plot(x,(standarize(atac_array)), color='#df979e', label="ATAC")
     plt.plot(x,(standarize(smoothed_wgs_array)+0.4), color='#98d1d1', label="WGS")
     borders_colorep1 = [0, 2109, 4392, 6241, 8068,9661, 11085, 12484, 13785, 14854, 16070, 17287, 18527, 19236, 20058, 20758, 21504, 22212, 22836, 23312, 23867, 24172, 24482]
+    borders_pGBM2937=[0,2218,4507, 6361, 8204, 9908, 11561,13069, 14459, 15540, 16829, 18115, 19394, 20343, 21188,21940, 22691, 23448, 24178, 24713, 25308, 25637, 25963]
+    borders_pGBM2932=[0, 2225,4519, 6373, 8216, 9920, 11572, 13086, 14476, 15558, 16850, 18136, 19417, 20367, 21212, 21967, 22722,23481, 24212, 24747, 25342, 25673, 26001]
+    borders_pGBM4021=[0, 2215,4502, 6356, 8198, 9900, 11551, 13050, 14440, 15518, 16803, 18087, 19367, 20316, 21160, 21912, 22658, 23417, 24142, 24676, 25271, 25598, 25922]
+    borders_pGBM3749=[0, 1961, 3911, 5560, 7034, 8468, 9881, 11199, 12527, 13437, 14521, 15597, 16676, 17431, 18123, 18771, 19386, 20117, 20744, 21238, 21757, 22064, 22365]
+    borders_pGBM3402=[0,2198,4484, 6338, 8179, 9871, 11523,13019,14406, 15485, 16756, 18019, 19296, 20243, 21079, 21829, 22577, 23301, 24027, 24527, 25122, 25450, 25802]
     #plt.plot(x,((atac_array)), color='#df979e', label="ATAC")
     #plt.plot(x,((wgs_array)), color='#98d1d1', label="WGS")
-    plt.title("COLO320 scATAC br15 minsizeCNV=0 compared to WGS")
-    for border in borders_colorep1:
+    plt.title("pGBM sample 4021")
+    for border in borders_pGBM4021:
         plt.axvline(border, color='gray')
     plt.xlim((0, len(atac_array)))
     plt.legend()
-    plt.show()
-
-    plt.show()
-    return(scipy.stats.pearsonr(standarize(atac_array),standarize(smoothed_wgs_array)), smoothed_wgs_array)
+    #plt.show()
+    return(scipy.stats.pearsonr(standarize(atac_array),standarize(smoothed_wgs_array)), smoothed_wgs_array, standarize(atac_array), standarize(smoothed_wgs_array))
 def createLinePlot(loss_wgs, base_wgs, gain_wgs, loss_atac, base_atac, gain_atac):
     new_base_wgs = [x * 2 for x in base_wgs]
     new_base_atac = [x * 2 for x in base_atac]
@@ -204,7 +207,7 @@ def createLinePlot(loss_wgs, base_wgs, gain_wgs, loss_atac, base_atac, gain_atac
     #plt.plot(both)
     for border in borders_colorep1:
         plt.axvline(border, color='gray')
-    plt.title("COLO320 scATAC br15 minsizeCNV=0 compared to WGS (CNVkit)")
+    plt.title("pGBM sample 2932")
     plt.xlim((0, len(atac_plot)))
     plt.legend()
     plt.show()
@@ -230,13 +233,15 @@ if __name__ =="__main__":
     snu_dict=createDictionaryFromTable(snu_full)
     bed_dict=createDictionaryFromBed(fin)
     common_wgs_dict, common_atac_dict = calculatePopulationSomiesWGS(snu_dict,bed_dict)
-    pd.DataFrame.from_dict(data=common_wgs_dict, orient='index').to_csv('COLO320_wgs_file.csv', header=False)
-    pd.DataFrame.from_dict(data=common_atac_dict, orient='index').to_csv('COLO320_scatac_file.csv', header=False)
-    #for sigma in range(1, 10, 1):
+    pd.DataFrame.from_dict(data=common_wgs_dict, orient='index').to_csv('pGBM_wgs_file_raw.csv', header=False)
+    #pd.DataFrame.from_dict(data=common_atac_dict, orient='index').to_csv('pGBM2937_scatac_file_raw.csv', header=False)
+    #for sigma in range(20, 80, 5):
     #    p.smooth_sigma = sigma
     for _ in (0,):
-        correlation, smoothed_wgs=createLinePlotAneufinder(common_wgs_dict, common_atac_dict,gaussian_sigma=p.smooth_sigma, filter_edges=p.filter_edges)
-        pd.DataFrame.from_dict(data=smoothed_wgs).to_csv('COLO320_wgs_smoothed_file.csv', header=False)
+        correlation, smoothed_wgs, standardATAC, standardWGS=createLinePlotAneufinder(common_wgs_dict, common_atac_dict,gaussian_sigma=p.smooth_sigma, filter_edges=p.filter_edges)
+        #pd.DataFrame.from_dict(data=smoothed_wgs).to_csv('pGBM2932_wgs_smoothed_file.csv', header=False)
+        pd.DataFrame.from_dict(data=standardATAC).to_csv('pGBM_atac_standard_file.csv', header=False)
+        pd.DataFrame.from_dict(data=standardWGS).to_csv('pGBM_wgs_standard_file_sm30.csv', header=False)
         harmonics[p.smooth_sigma] = correlation
         print(harmonics)
 
